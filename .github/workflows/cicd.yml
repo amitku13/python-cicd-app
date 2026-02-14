@@ -1,0 +1,47 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - qa
+      - main
+
+jobs:
+
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        run: |
+          pytest
+
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Dev
+        if: github.ref == 'refs/heads/dev'
+        run: echo "Deploying to DEV environment"
+
+      - name: Deploy to QA
+        if: github.ref == 'refs/heads/qa'
+        run: echo "Deploying to QA environment"
+
+      - name: Deploy to Production
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploying to PROD environment"
